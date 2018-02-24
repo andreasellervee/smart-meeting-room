@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import hackaton.intuit.uk.smart_rooms_estimote.entities.Booking;
 import hackaton.intuit.uk.smart_rooms_estimote.network.AddUserToBookingTask;
 import hackaton.intuit.uk.smart_rooms_estimote.repository.BookingInMemoryRepo;
 
@@ -19,7 +20,7 @@ public class JoinActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         final String bookingId = intent.getStringExtra("bookingId");
-        String meetingRoomName = intent.getStringExtra("meetingRoomName");
+        final String meetingRoomName = intent.getStringExtra("meetingRoomName");
 
         TextView joinText = (TextView) findViewById(R.id.join_text);
         StringBuilder ongoingMeeting = new StringBuilder();
@@ -39,7 +40,7 @@ public class JoinActivity extends AppCompatActivity {
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new AddUserToBookingTask().execute(bookingId, getString(R.string.user_id));
+                new AddUserToBookingTask(getApplicationContext()).execute(bookingId, getString(R.string.user_id), meetingRoomName, BookingInMemoryRepo.getBooking().getTitle());
                 setResult(RESULT_OK);
                 JoinActivity.this.finish();
             }

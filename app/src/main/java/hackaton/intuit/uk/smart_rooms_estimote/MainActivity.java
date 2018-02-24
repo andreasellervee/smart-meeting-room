@@ -1,5 +1,9 @@
 package hackaton.intuit.uk.smart_rooms_estimote;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -41,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.textView);
 
         createGeneralProximityObserver();
+        createNotificationChannel();
         requirements();
     }
 
@@ -68,6 +73,22 @@ public class MainActivity extends AppCompatActivity {
                 .withOnExitAction(new OnExit())
                 .create();
         this.proximityObserver.addProximityZone(generalProximityObserver);
+    }
+
+    private void createNotificationChannel(){
+        NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Create the NotificationChannel, but only on API 26+ because
+            // the NotificationChannel class is new and not in the support library
+            CharSequence name = getApplicationContext().getString(R.string.channel_name);
+            String description = getApplicationContext().getString(R.string.channel_description);
+            NotificationChannel channel = new NotificationChannel("homersimpson", name, NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription(description);
+            // Register the channel with the system
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     private class OnEntry implements Function1<ProximityAttachment, Unit> {

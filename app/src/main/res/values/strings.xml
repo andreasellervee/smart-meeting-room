@@ -3,5 +3,8 @@
     <string name="app_id">andreas-estimote-smart-mee-7wg</string>
     <string name="app_token">89c3f012eaa54e990f7c0d741dd7ea78</string>
 
-    <string name="user_id">1</string>
+    <string name="user_id">2</string>
+    <string name="channel_name">notificationChannel</string>
+    <string name="channel_description">channel description</string>
+
 </resources>
