@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private void createGeneralProximityObserver() {
         ProximityZone generalProximityObserver = this.proximityObserver.zoneBuilder()
                 .forAttachmentKeyAndValue("my_company", "meeting_room")
-                .inCustomRange(0.1)
+                .inCustomRange(0.3)
                 .withOnEnterAction(new OnEntry())
                 .withOnChangeAction(new OnChange())
                 .withOnExitAction(new OnExit())
