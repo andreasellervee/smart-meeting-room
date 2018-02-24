@@ -109,8 +109,8 @@ public class CreateBookingTask extends AsyncTask<String, String, BookingResponse
             StringBuilder meetingCreated = createMeetingCreatedMessage(booking);
             textView.setText(meetingCreated.toString());
         } else if (bookingResponse.equals(HttpStatus.BAD_REQUEST)) {
-            if (attendeeIds.contains("1")) {
-                DateFormat df = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+            if (attendeeIds.contains(context.getString(R.string.user_id))) {
+                DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                 StringBuilder inAMeeting = new StringBuilder();
                 inAMeeting.append("Currently in\n")
                         .append(booking.getTitle())
@@ -127,7 +127,7 @@ public class CreateBookingTask extends AsyncTask<String, String, BookingResponse
     }
 
     private StringBuilder createMeetingCreatedMessage(Booking booking) {
-        DateFormat df = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         StringBuilder meetingCreated = new StringBuilder();
         meetingCreated.append("Meeting\n");
         meetingCreated.append("'").append(booking.getTitle()).append("'");

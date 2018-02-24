@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         Booking booking = BookingInMemoryRepo.getBooking();
         if (booking != null) {
-            DateFormat df = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+            DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
             StringBuilder inAMeeting = new StringBuilder();
             inAMeeting.append("Currently in\n")
                     .append(booking.getTitle())
