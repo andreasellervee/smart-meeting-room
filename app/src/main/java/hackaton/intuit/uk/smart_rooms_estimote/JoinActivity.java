@@ -18,7 +18,7 @@ public class JoinActivity extends AppCompatActivity {
         setContentView(R.layout.activity_join);
 
         Intent intent = getIntent();
-        final String meetingRoomId = intent.getStringExtra("meetingRoomId");
+        final String bookingId = intent.getStringExtra("bookingId");
         String meetingRoomName = intent.getStringExtra("meetingRoomName");
 
         TextView joinText = (TextView) findViewById(R.id.join_text);
@@ -39,7 +39,7 @@ public class JoinActivity extends AppCompatActivity {
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new AddUserToBookingTask().execute(meetingRoomId, getString(R.string.user_id));
+                new AddUserToBookingTask().execute(bookingId, getString(R.string.user_id));
                 setResult(RESULT_OK);
                 JoinActivity.this.finish();
             }

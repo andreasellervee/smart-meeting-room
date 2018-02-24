@@ -120,7 +120,7 @@ public class CreateBookingTask extends AsyncTask<String, String, BookingResponse
                 return;
             }
             Intent intent = new Intent(context, JoinActivity.class);
-            intent.putExtra("meetingRoomId", booking.getId());
+            intent.putExtra("bookingId", booking.getId());
             intent.putExtra("meetingRoomName", booking.getRoom() != null ? booking.getRoom().getName() : "noName");
             context.startActivity(intent);
         }

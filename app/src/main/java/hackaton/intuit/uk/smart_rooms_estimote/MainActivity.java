@@ -64,9 +64,9 @@ public class MainActivity extends AppCompatActivity {
                 .forAttachmentKeyAndValue("my_company", "meeting_room")
                 .inCustomRange(0.1)
                 .withOnEnterAction(new OnEntry())
+                .withOnChangeAction(new OnChange())
                 .withOnExitAction(new OnExit())
                 .create();
-        Log.i("app", "Added ENTRY proximity zone");
         this.proximityObserver.addProximityZone(generalProximityObserver);
     }
 
@@ -76,9 +76,23 @@ public class MainActivity extends AppCompatActivity {
         public Unit invoke(ProximityAttachment proximityAttachment) {
             String meetingRoomId = proximityAttachment.getPayload().get("meeting_room_id");
             String meetingRoomName = proximityAttachment.getPayload().get("meeting_room_name");
-            Log.i("app", "Welcome to meeting room " + meetingRoomName);
             CreateBookingTask createBookingTask = new CreateBookingTask(getApplicationContext(), textView);
             createBookingTask.execute(meetingRoomId, meetingRoomName);
+            return null;
+        }
+    }
+
+    private class OnChange implements Function1<List<? extends ProximityAttachment>, Unit> {
+
+        @Override
+        public Unit invoke(List<? extends ProximityAttachment> proximityAttachments) {
+            for (ProximityAttachment attachment : proximityAttachments) {
+                Log.i("app", "Nearby: " + attachment.getPayload().get("desk_owner"));
+            }
+            Booking booking = BookingInMemoryRepo.getBooking();
+            if (booking != null) {
+                Log.i("app", "Currently ongoing booking in " + booking.getRoom().getName());
+            }
             return null;
         }
     }
@@ -88,10 +102,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public Unit invoke(ProximityAttachment proximityAttachment) {
             String meetingRoomName = proximityAttachment.getPayload().get("meeting_room_name");
-            Log.i("app", "Leaving " + meetingRoomName);
             textView.setText("Leaving meeting room: " + meetingRoomName);
             Booking currentBooking = BookingInMemoryRepo.getBooking();
-            new RemoveUserFromBookingTask().execute(currentBooking.getId(), getString(R.string.user_id));
+            if (currentBooking != null) {
+                new RemoveUserFromBookingTask().execute(currentBooking.getId(), getString(R.string.user_id));
+            }
             BookingInMemoryRepo.setBooking(null);
             textView.setText("Welcome to Smart World!");
             return null;
