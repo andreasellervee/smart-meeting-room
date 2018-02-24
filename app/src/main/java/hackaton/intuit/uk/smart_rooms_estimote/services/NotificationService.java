@@ -20,7 +20,8 @@ public class NotificationService {
 
     public void publishNotification(String title, String description) {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(applicationContext, "homersimpson")
-                .setSmallIcon(R.drawable.ic_honeybee_logo)
+                .setBadgeIconType(R.drawable.ic_stat_name)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle(title)
                 .setContentText(description)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
