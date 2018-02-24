@@ -33,7 +33,8 @@ import kotlin.jvm.functions.Function1;
 public class MainActivity extends AppCompatActivity {
 
     private ProximityObserver proximityObserver;
-    private TextView textView;
+    private TextView title;
+    private TextView subtitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
         initProximityObserver();
 
         // Layout stuff
-        textView = findViewById(R.id.textView);
+        title = findViewById(R.id.title);
+        subtitle = findViewById(R.id.subtitle);
 
         createGeneralProximityObserver();
         createNotificationChannel();
@@ -54,13 +56,14 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         Booking booking = BookingInMemoryRepo.getBooking();
         if (booking != null) {
-            DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             StringBuilder inAMeeting = new StringBuilder();
             inAMeeting.append("Currently in\n")
                     .append(booking.getTitle())
                     .append("\nuntil\n")
                     .append(df.format(booking.getEndDate()));
-            textView.setText(inAMeeting.toString());
+            title.setText(inAMeeting.toString());
+            subtitle.setText("");
         }
     }
 
@@ -97,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         public Unit invoke(ProximityAttachment proximityAttachment) {
             String meetingRoomId = proximityAttachment.getPayload().get("meeting_room_id");
             String meetingRoomName = proximityAttachment.getPayload().get("meeting_room_name");
-            CreateBookingTask createBookingTask = new CreateBookingTask(getApplicationContext(), textView);
+            CreateBookingTask createBookingTask = new CreateBookingTask(getApplicationContext(), title, subtitle);
             createBookingTask.execute(meetingRoomId, meetingRoomName);
             return null;
         }
@@ -125,13 +128,14 @@ public class MainActivity extends AppCompatActivity {
             String meetingRoomId = proximityAttachment.getPayload().get("meeting_room_id");
             String meetingRoomName = proximityAttachment.getPayload().get("meeting_room_name");
             Log.i("app", "Leaving " + meetingRoomName);
-            textView.setText("Leaving meeting room: " + meetingRoomName);
+            title.setText("Leaving meeting room: " + meetingRoomName);
             Booking currentBooking = BookingInMemoryRepo.getBooking();
             if (currentBooking != null) {
                 new RemoveUserFromBookingTask(getApplicationContext()).execute(currentBooking.getId(), getString(R.string.user_id), meetingRoomName, currentBooking.getTitle());
             }
             BookingInMemoryRepo.setBooking(null);
-            textView.setText("Welcome to Honeybee");
+            title.setText("Welcome to Honeybee");
+            subtitle.setText("Walk into a room to start");
             return null;
         }
     }

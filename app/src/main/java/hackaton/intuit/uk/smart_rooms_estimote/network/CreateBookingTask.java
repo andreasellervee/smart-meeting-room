@@ -37,11 +37,13 @@ import hackaton.intuit.uk.smart_rooms_estimote.repository.BookingInMemoryRepo;
 public class CreateBookingTask extends AsyncTask<String, String, BookingResponseWrapper> {
 
     private final Context context;
-    private final TextView textView;
+    private final TextView title;
+    private final TextView subtitle;
 
-    public CreateBookingTask(Context applicationContext, TextView textView) {
+    public CreateBookingTask(Context applicationContext, TextView title, TextView subtitle) {
         this.context = applicationContext;
-        this.textView = textView;
+        this.title = title;
+        this.subtitle = subtitle;
     }
 
     @Override
@@ -106,17 +108,17 @@ public class CreateBookingTask extends AsyncTask<String, String, BookingResponse
 
         if (bookingResponse.equals(HttpStatus.CREATED)) {
             // new booking created
-            StringBuilder meetingCreated = createMeetingCreatedMessage(booking);
-            textView.setText(meetingCreated.toString());
+            title.setText(createTitleMessage(booking).toString());
+            subtitle.setText(createSubtitleMessage(booking).toString());
         } else if (bookingResponse.equals(HttpStatus.BAD_REQUEST)) {
             if (attendeeIds.contains(context.getString(R.string.user_id))) {
-                DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                StringBuilder inAMeeting = new StringBuilder();
-                inAMeeting.append("Currently in\n")
-                        .append(booking.getTitle())
-                        .append("\nuntil\n")
-                        .append(df.format(booking.getEndDate()));
-                textView.setText(inAMeeting.toString());
+                DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                StringBuilder titleBuilder = new StringBuilder();
+                titleBuilder.append("Currently in ").append(booking.getTitle());
+                title.setText(titleBuilder.toString());
+
+                String subtitleBuilder = "until " + df.format(booking.getEndDate());
+                subtitle.setText(subtitleBuilder);
                 return;
             }
             Intent intent = new Intent(context, JoinActivity.class);
@@ -126,16 +128,23 @@ public class CreateBookingTask extends AsyncTask<String, String, BookingResponse
         }
     }
 
-    private StringBuilder createMeetingCreatedMessage(Booking booking) {
-        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    private StringBuilder createTitleMessage(Booking booking) {
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         StringBuilder meetingCreated = new StringBuilder();
         meetingCreated.append("Meeting\n");
         meetingCreated.append("'").append(booking.getTitle()).append("'");
         meetingCreated.append("\n created in \n");
         meetingCreated.append(booking.getRoom().getName());
-        meetingCreated.append("\nfrom\n");
+
+        return meetingCreated;
+    }
+
+    private StringBuilder createSubtitleMessage(Booking booking) {
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        StringBuilder meetingCreated = new StringBuilder();
+        meetingCreated.append("\nFrom\n");
         meetingCreated.append(df.format(booking.getStartDate()));
-        meetingCreated.append("\nto\n");
+        meetingCreated.append("\nTo\n");
         meetingCreated.append(df.format(booking.getEndDate()));
         return meetingCreated;
     }
