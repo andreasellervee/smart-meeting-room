@@ -108,13 +108,15 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Unit invoke(ProximityAttachment proximityAttachment) {
+            String meetingRoomId = proximityAttachment.getPayload().get("meeting_room_id");
             String meetingRoomName = proximityAttachment.getPayload().get("meeting_room_name");
+
             Log.i("app", "Leaving " + meetingRoomName);
             textView.setText("Leaving meeting room: " + meetingRoomName);
             Booking currentBooking = BookingInMemoryRepo.getBooking();
-            new RemoveUserFromBookingTask().execute(currentBooking.getId(), getString(R.string.user_id));
+            new RemoveUserFromBookingTask(getApplicationContext()).execute(currentBooking.getId(), getString(R.string.user_id), meetingRoomName, currentBooking.getTitle());
             BookingInMemoryRepo.setBooking(null);
-            textView.setText("Welcome to Smart World!");
+            textView.setText("Welcome to Honeybee");
             return null;
         }
     }
