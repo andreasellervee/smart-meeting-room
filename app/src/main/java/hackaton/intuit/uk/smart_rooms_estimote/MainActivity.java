@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private void createGeneralProximityObserver() {
         ProximityZone generalProximityObserver = this.proximityObserver.zoneBuilder()
                 .forAttachmentKeyAndValue("my_company", "meeting_room")
-                .inNearRange()
+                .inCustomRange(2)
                 .withOnEnterAction(new OnEntry())
                 .withOnExitAction(new OnExit())
                 .create();
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             String meetingRoomId = proximityAttachment.getPayload().get("meeting_room_id");
             String meetingRoomName = proximityAttachment.getPayload().get("meeting_room_name");
             Log.i("app", "Welcome to meeting room " + meetingRoomName);
-            textView.setText("Welcome to meeting room: " + meetingRoomName);
+            textView.setText("Welcome to meeting room: " + meetingRoomName + "(" + meetingRoomId + ")");
             CreateBookingTask createBookingTask = new CreateBookingTask(getApplicationContext(), textView);
             createBookingTask.execute(meetingRoomId, meetingRoomName);
             return null;
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
     @NonNull
     private EstimoteCloudCredentials getEstimoteCredentials() {
-        return new EstimoteCloudCredentials("andreas-estimote-smart-mee-7wg", "89c3f012eaa54e990f7c0d741dd7ea78");
+        return new EstimoteCloudCredentials(getString(R.string.app_id), getString(R.string.app_token));
     }
 
     private void requirements() {
