@@ -15,6 +15,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -22,6 +24,7 @@ import hackaton.intuit.uk.smart_rooms_estimote.JoinActivity;
 import hackaton.intuit.uk.smart_rooms_estimote.entities.Booking;
 import hackaton.intuit.uk.smart_rooms_estimote.entities.BookingResponseWrapper;
 import hackaton.intuit.uk.smart_rooms_estimote.entities.CreateBookingDto;
+import hackaton.intuit.uk.smart_rooms_estimote.repository.BookingInMemoryRepo;
 
 /**
  * Created by andulrv on 24/02/18.
@@ -45,7 +48,8 @@ public class CreateBookingTask extends AsyncTask<String, String, BookingResponse
 
         String url = "https://calm-ridge-51167.herokuapp.com/v1/booking";
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+        MappingJackson2HttpMessageConverter mapper = new MappingJackson2HttpMessageConverter();
+        restTemplate.getMessageConverters().add(mapper);
 
         Calendar endTime = Calendar.getInstance();
         endTime.setTime(new Date());
@@ -89,11 +93,13 @@ public class CreateBookingTask extends AsyncTask<String, String, BookingResponse
         }
 
         Booking booking = bookingWrapper.getBooking();
+        BookingInMemoryRepo.setBooking(booking);
         HttpStatus bookingResponse = bookingWrapper.getHttpStatus();
 
         if (bookingResponse.equals(HttpStatus.CREATED)) {
             // new booking created
-            textView.setText("Meeting " + booking.getTitle() + " created in " + booking.getRoom().getName());
+            StringBuilder meetingCreated = createMeetingCreatedMessage(booking);
+            textView.setText(meetingCreated.toString());
         } else if (bookingResponse.equals(HttpStatus.BAD_REQUEST)) {
             // booking existing, wanna join?
             Intent intent = new Intent(context, JoinActivity.class);
@@ -101,6 +107,20 @@ public class CreateBookingTask extends AsyncTask<String, String, BookingResponse
             intent.putExtra("meetingRoomName", booking.getRoom() != null ? booking.getRoom().getName() : "noName");
             context.startActivity(intent);
         }
+    }
+
+    private StringBuilder createMeetingCreatedMessage(Booking booking) {
+        DateFormat df = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+        StringBuilder meetingCreated = new StringBuilder();
+        meetingCreated.append("Meeting\n");
+        meetingCreated.append("'").append(booking.getTitle()).append("'");
+        meetingCreated.append("\n created in \n");
+        meetingCreated.append(booking.getRoom().getName());
+        meetingCreated.append("\nfrom\n");
+        meetingCreated.append(df.format(booking.getStartDate()));
+        meetingCreated.append("\nto\n");
+        meetingCreated.append(df.format(booking.getEndDate()));
+        return meetingCreated;
     }
 
 }

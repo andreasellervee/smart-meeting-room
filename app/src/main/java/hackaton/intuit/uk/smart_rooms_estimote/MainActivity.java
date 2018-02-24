@@ -1,5 +1,6 @@
 package hackaton.intuit.uk.smart_rooms_estimote;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +17,10 @@ import com.estimote.proximity_sdk.proximity.ProximityZone;
 
 import java.util.List;
 
+import hackaton.intuit.uk.smart_rooms_estimote.entities.Booking;
 import hackaton.intuit.uk.smart_rooms_estimote.network.CreateBookingTask;
+import hackaton.intuit.uk.smart_rooms_estimote.network.RemoveUserFromBookingTask;
+import hackaton.intuit.uk.smart_rooms_estimote.repository.BookingInMemoryRepo;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
@@ -40,9 +44,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Log.i("app", "On Resume");
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i("app", requestCode + " " + resultCode + " " + data);
+        if (resultCode == RESULT_OK) {
+            Booking booking = BookingInMemoryRepo.getBooking();
+            textView.setText("Currently in a meeting titled:\n" + booking.getTitle());
+        }
     }
 
     private void createGeneralProximityObserver() {
@@ -63,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
             String meetingRoomId = proximityAttachment.getPayload().get("meeting_room_id");
             String meetingRoomName = proximityAttachment.getPayload().get("meeting_room_name");
             Log.i("app", "Welcome to meeting room " + meetingRoomName);
-            textView.setText("Welcome to meeting room: " + meetingRoomName + "(" + meetingRoomId + ")");
             CreateBookingTask createBookingTask = new CreateBookingTask(getApplicationContext(), textView);
             createBookingTask.execute(meetingRoomId, meetingRoomName);
             return null;
@@ -77,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
             String meetingRoomName = proximityAttachment.getPayload().get("meeting_room_name");
             Log.i("app", "Leaving " + meetingRoomName);
             textView.setText("Leaving meeting room: " + meetingRoomName);
+            Booking currentBooking = BookingInMemoryRepo.getBooking();
+            new RemoveUserFromBookingTask().execute(currentBooking.getId(), "1");
+            BookingInMemoryRepo.setBooking(null);
+            textView.setText("Welcome to Smart World!");
             return null;
         }
     }

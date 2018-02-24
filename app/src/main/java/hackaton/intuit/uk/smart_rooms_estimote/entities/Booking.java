@@ -1,5 +1,7 @@
 package hackaton.intuit.uk.smart_rooms_estimote.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Date;
 import java.util.List;
 
@@ -7,6 +9,7 @@ import java.util.List;
  * Created by andulrv on 24/02/18.
  */
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Booking {
 
     private String id;

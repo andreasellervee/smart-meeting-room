@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -20,9 +21,12 @@ public class RemoveUserFromBookingTask extends AsyncTask<String, String, String>
         String url = "https://calm-ridge-51167.herokuapp.com/v1/booking/" + bookingId + "/user/" + userId;
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-        restTemplate.delete(url);
-
-        Log.i("app", "Added user " + userId + " to booking " + bookingId);
+        try {
+            restTemplate.delete(url);
+            Log.i("app", "Removed user " + userId + " from booking " + bookingId);
+        } catch (HttpClientErrorException e) {
+            Log.e("app", e.getMessage());
+        }
         return "Removed";
     }
 

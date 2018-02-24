@@ -1,11 +1,13 @@
 package hackaton.intuit.uk.smart_rooms_estimote.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Date;
 
 /**
  * Created by andulrv on 24/02/18.
  */
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateBookingDto {
 
     private Date startDate;
