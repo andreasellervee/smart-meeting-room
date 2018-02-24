@@ -1,6 +1,5 @@
 package hackaton.intuit.uk.smart_rooms_estimote;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +14,8 @@ import com.estimote.proximity_sdk.proximity.ProximityObserver;
 import com.estimote.proximity_sdk.proximity.ProximityObserverBuilder;
 import com.estimote.proximity_sdk.proximity.ProximityZone;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import hackaton.intuit.uk.smart_rooms_estimote.entities.Booking;
@@ -44,18 +45,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i("app", requestCode + " " + resultCode + " " + data);
-        if (resultCode == RESULT_OK) {
-            Booking booking = BookingInMemoryRepo.getBooking();
-            textView.setText("Currently in a meeting titled:\n" + booking.getTitle());
+    protected void onResume() {
+        super.onResume();
+        Booking booking = BookingInMemoryRepo.getBooking();
+        if (booking != null) {
+            DateFormat df = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+            StringBuilder inAMeeting = new StringBuilder();
+            inAMeeting.append("Currently in\n")
+                    .append(booking.getTitle())
+                    .append("\nuntil\n")
+                    .append(df.format(booking.getEndDate()));
+            textView.setText(inAMeeting.toString());
         }
     }
 
     private void createGeneralProximityObserver() {
         ProximityZone generalProximityObserver = this.proximityObserver.zoneBuilder()
                 .forAttachmentKeyAndValue("my_company", "meeting_room")
-                .inCustomRange(2)
+                .inCustomRange(0.1)
                 .withOnEnterAction(new OnEntry())
                 .withOnExitAction(new OnExit())
                 .create();

@@ -19,11 +19,14 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import hackaton.intuit.uk.smart_rooms_estimote.JoinActivity;
 import hackaton.intuit.uk.smart_rooms_estimote.entities.Booking;
 import hackaton.intuit.uk.smart_rooms_estimote.entities.BookingResponseWrapper;
 import hackaton.intuit.uk.smart_rooms_estimote.entities.CreateBookingDto;
+import hackaton.intuit.uk.smart_rooms_estimote.entities.User;
 import hackaton.intuit.uk.smart_rooms_estimote.repository.BookingInMemoryRepo;
 
 /**
@@ -93,6 +96,10 @@ public class CreateBookingTask extends AsyncTask<String, String, BookingResponse
         }
 
         Booking booking = bookingWrapper.getBooking();
+        Set<String> attendeeIds = new HashSet<>();
+        for (User user : booking.getAttendees()) {
+            attendeeIds.add(user.getId());
+        }
         BookingInMemoryRepo.setBooking(booking);
         HttpStatus bookingResponse = bookingWrapper.getHttpStatus();
 
@@ -101,7 +108,16 @@ public class CreateBookingTask extends AsyncTask<String, String, BookingResponse
             StringBuilder meetingCreated = createMeetingCreatedMessage(booking);
             textView.setText(meetingCreated.toString());
         } else if (bookingResponse.equals(HttpStatus.BAD_REQUEST)) {
-            // booking existing, wanna join?
+            if (attendeeIds.contains("1")) {
+                DateFormat df = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+                StringBuilder inAMeeting = new StringBuilder();
+                inAMeeting.append("Currently in\n")
+                        .append(booking.getTitle())
+                        .append("\nuntil\n")
+                        .append(df.format(booking.getEndDate()));
+                textView.setText(inAMeeting.toString());
+                return;
+            }
             Intent intent = new Intent(context, JoinActivity.class);
             intent.putExtra("meetingRoomId", booking.getId());
             intent.putExtra("meetingRoomName", booking.getRoom() != null ? booking.getRoom().getName() : "noName");
