@@ -39,7 +39,7 @@ public class JoinActivity extends AppCompatActivity {
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new AddUserToBookingTask().execute(meetingRoomId, "1");
+                new AddUserToBookingTask().execute(meetingRoomId, getString(R.string.user_id));
                 setResult(RESULT_OK);
                 JoinActivity.this.finish();
             }

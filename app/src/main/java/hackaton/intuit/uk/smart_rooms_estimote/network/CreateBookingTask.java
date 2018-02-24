@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import hackaton.intuit.uk.smart_rooms_estimote.JoinActivity;
+import hackaton.intuit.uk.smart_rooms_estimote.R;
 import hackaton.intuit.uk.smart_rooms_estimote.entities.Booking;
 import hackaton.intuit.uk.smart_rooms_estimote.entities.BookingResponseWrapper;
 import hackaton.intuit.uk.smart_rooms_estimote.entities.CreateBookingDto;
@@ -62,7 +63,7 @@ public class CreateBookingTask extends AsyncTask<String, String, BookingResponse
         booking.setStartDate(new Date());
         booking.setEndDate(endTime.getTime());
         booking.setRoomId(meetingRoomId);
-        booking.setOwnerId("1");
+        booking.setOwnerId(context.getString(R.string.user_id));
 
         try {
             ResponseEntity<Booking> stringResponseEntity = restTemplate.postForEntity(url, booking, Booking.class);

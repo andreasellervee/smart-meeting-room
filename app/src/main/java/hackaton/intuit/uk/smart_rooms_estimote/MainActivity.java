@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("app", "Leaving " + meetingRoomName);
             textView.setText("Leaving meeting room: " + meetingRoomName);
             Booking currentBooking = BookingInMemoryRepo.getBooking();
-            new RemoveUserFromBookingTask().execute(currentBooking.getId(), "1");
+            new RemoveUserFromBookingTask().execute(currentBooking.getId(), getString(R.string.user_id));
             BookingInMemoryRepo.setBooking(null);
             textView.setText("Welcome to Smart World!");
             return null;
