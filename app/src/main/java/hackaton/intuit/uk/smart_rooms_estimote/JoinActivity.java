@@ -12,6 +12,7 @@ import java.util.List;
 
 import hackaton.intuit.uk.smart_rooms_estimote.entities.User;
 import hackaton.intuit.uk.smart_rooms_estimote.network.AddUserToBookingTask;
+import hackaton.intuit.uk.smart_rooms_estimote.network.AnotherBookingTask;
 import hackaton.intuit.uk.smart_rooms_estimote.repository.BookingInMemoryRepo;
 
 public class JoinActivity extends AppCompatActivity {
@@ -37,6 +38,8 @@ public class JoinActivity extends AppCompatActivity {
 
         Button joinButton = (Button) findViewById(R.id.join_button);
         joinButton.setText("Join " + meetingRoomName + "?");
+        Button anotherRoom = (Button) findViewById(R.id.another_room_button);
+        anotherRoom.setText("Find & Book another room?");
         Button leaveButton = (Button) findViewById(R.id.leave_button);
         leaveButton.setText("Whoops. I will leave " + meetingRoomName + " now");
 
@@ -46,6 +49,13 @@ public class JoinActivity extends AppCompatActivity {
                 new AddUserToBookingTask(getApplicationContext()).execute(bookingId, getString(R.string.user_id), meetingRoomName, BookingInMemoryRepo.getBooking().getTitle());
                 setResult(RESULT_OK);
                 JoinActivity.this.finish();
+            }
+        });
+
+        anotherRoom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AnotherBookingTask(getApplicationContext()).execute();
             }
         });
 
