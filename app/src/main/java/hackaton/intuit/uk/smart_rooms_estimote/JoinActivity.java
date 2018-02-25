@@ -2,12 +2,15 @@ package hackaton.intuit.uk.smart_rooms_estimote;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import hackaton.intuit.uk.smart_rooms_estimote.entities.Booking;
+import java.util.List;
+
+import hackaton.intuit.uk.smart_rooms_estimote.entities.User;
 import hackaton.intuit.uk.smart_rooms_estimote.network.AddUserToBookingTask;
 import hackaton.intuit.uk.smart_rooms_estimote.repository.BookingInMemoryRepo;
 
@@ -27,7 +30,7 @@ public class JoinActivity extends AppCompatActivity {
         ongoingMeeting.append("Ongoing meeting in '")
                 .append(meetingRoomName)
                 .append("' with \n")
-                .append(BookingInMemoryRepo.getBooking().getAttendees())
+                .append(getConcatenatedAttendees())
                 .append(".\n")
                 .append("Do you .. ?");
         joinText.setText(ongoingMeeting.toString());
@@ -54,5 +57,20 @@ public class JoinActivity extends AppCompatActivity {
                 JoinActivity.this.finish();
             }
         });
+    }
+
+    @NonNull
+    private StringBuilder getConcatenatedAttendees() {
+        StringBuilder attendeesConcat = new StringBuilder();
+        List<User> attendees = BookingInMemoryRepo.getBooking().getAttendees();
+        if (!attendees.isEmpty() && attendees.size() == 1) {
+            attendeesConcat = new StringBuilder(attendees.get(0).getNickname());
+        } else {
+            for (int i = 0; i < attendees.size()-1; i++) {
+                attendeesConcat.append(attendees.get(i).getNickname()).append(", ");
+            }
+            attendeesConcat.append(" and ").append(attendees.get(attendees.size() - 1).getNickname());
+        }
+        return attendeesConcat;
     }
 }
