@@ -26,6 +26,7 @@ import hackaton.intuit.uk.smart_rooms_estimote.entities.Booking;
 import hackaton.intuit.uk.smart_rooms_estimote.network.CreateBookingTask;
 import hackaton.intuit.uk.smart_rooms_estimote.network.RemoveUserFromBookingTask;
 import hackaton.intuit.uk.smart_rooms_estimote.repository.BookingInMemoryRepo;
+import hackaton.intuit.uk.smart_rooms_estimote.repository.CurrentRoomTracker;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
@@ -70,9 +71,8 @@ public class MainActivity extends AppCompatActivity {
     private void createGeneralProximityObserver() {
         ProximityZone generalProximityObserver = this.proximityObserver.zoneBuilder()
                 .forAttachmentKeyAndValue("my_company", "meeting_room")
-                .inCustomRange(0.3)
+                .inCustomRange(0.2)
                 .withOnEnterAction(new OnEntry())
-                .withOnChangeAction(new OnChange())
                 .withOnExitAction(new OnExit())
                 .create();
         this.proximityObserver.addProximityZone(generalProximityObserver);
@@ -100,23 +100,13 @@ public class MainActivity extends AppCompatActivity {
         public Unit invoke(ProximityAttachment proximityAttachment) {
             String meetingRoomId = proximityAttachment.getPayload().get("meeting_room_id");
             String meetingRoomName = proximityAttachment.getPayload().get("meeting_room_name");
+            if (meetingRoomId.equals(CurrentRoomTracker.getRoomId()) || BookingInMemoryRepo.getBooking() != null) {
+                // avoid multiple calls
+                return null;
+            }
+            CurrentRoomTracker.setRoomId(meetingRoomId);
             CreateBookingTask createBookingTask = new CreateBookingTask(getApplicationContext(), title, subtitle);
             createBookingTask.execute(meetingRoomId, meetingRoomName);
-            return null;
-        }
-    }
-
-    private class OnChange implements Function1<List<? extends ProximityAttachment>, Unit> {
-
-        @Override
-        public Unit invoke(List<? extends ProximityAttachment> proximityAttachments) {
-            for (ProximityAttachment attachment : proximityAttachments) {
-                Log.i("app", "Nearby: " + attachment.getPayload().get("desk_owner"));
-            }
-            Booking booking = BookingInMemoryRepo.getBooking();
-            if (booking != null) {
-                Log.i("app", "Currently ongoing booking in " + booking.getRoom().getName());
-            }
             return null;
         }
     }
@@ -134,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 new RemoveUserFromBookingTask(getApplicationContext()).execute(currentBooking.getId(), getString(R.string.user_id), meetingRoomName, currentBooking.getTitle());
             }
             BookingInMemoryRepo.setBooking(null);
+            CurrentRoomTracker.setRoomId(null);
             title.setText("Welcome to Honeybee");
             subtitle.setText("Walk into a room to start");
             return null;

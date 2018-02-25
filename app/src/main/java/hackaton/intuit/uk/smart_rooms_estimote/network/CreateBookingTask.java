@@ -29,6 +29,7 @@ import hackaton.intuit.uk.smart_rooms_estimote.entities.BookingResponseWrapper;
 import hackaton.intuit.uk.smart_rooms_estimote.entities.CreateBookingDto;
 import hackaton.intuit.uk.smart_rooms_estimote.entities.User;
 import hackaton.intuit.uk.smart_rooms_estimote.repository.BookingInMemoryRepo;
+import hackaton.intuit.uk.smart_rooms_estimote.repository.CurrentRoomTracker;
 
 /**
  * Created by andulrv on 24/02/18.
@@ -82,10 +83,13 @@ public class CreateBookingTask extends AsyncTask<String, String, BookingResponse
                     existingBooking = objectMapper.readValue(e.getResponseBodyAsString(), Booking.class);
                 } catch (IOException e1) {
                     e1.printStackTrace();
+                    CurrentRoomTracker.setRoomId(null);
                 }
                 return new BookingResponseWrapper(e.getStatusCode(), existingBooking);
             }
+            CurrentRoomTracker.setRoomId(null);
         } catch (Exception e) {
+            CurrentRoomTracker.setRoomId(null);
             Log.e("app", e.getMessage());
         }
         return null;
